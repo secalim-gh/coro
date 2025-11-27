@@ -27,11 +27,10 @@ CORODEF Coro coro_create(void *co);
 CORODEF void* coro_yield(void *pass);
 CORODEF void coro_destroy(Coro co); 
 CORODEF void* coro_resume(Coro co, void *pass);
-
+#define CORO_IMPLEMENTATION
 #ifdef CORO_IMPLEMENTATION
 #undef CORO_IMPLEMENTATION
 
-//#define __aarch64__ 
 // Valid for Apple Silicon (ARM64)
 #if defined(__aarch64__) || defined(__arm64__)
 typedef struct __attribute__((aligned(16))) Context {
