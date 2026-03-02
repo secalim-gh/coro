@@ -11,8 +11,9 @@ Just include the header, defining *ONCE* CORO_IMPLEMENTATION before including:
 
 ### Example
 <details>
-<summary>Advanced notes</summary>
-```c
+<summary>Producer / Consumer</summary>  
+
+```c  
 #define CORO_IMPLEMENTATION
 #include "async.h"
 #include <stdio.h>
