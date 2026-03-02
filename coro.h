@@ -8,7 +8,8 @@
 
 #ifndef STACK_SIZE
 #include <unistd.h>
-#define STACK_SIZE 512*getpagesize()
+#define PAGE_SIZE getpagesize();
+#define STACK_SIZE (512 * PAGE_SIZE)
 #endif
 
 #ifndef CORO_ALLOC
@@ -27,7 +28,9 @@ CORODEF Coro coro_create(void *co);
 CORODEF void* coro_yield(void *pass);
 CORODEF void coro_destroy(Coro co); 
 CORODEF void* coro_resume(Coro co, void *pass);
-#define CORO_IMPLEMENTATION
+
+#endif // HEADER
+
 #ifdef CORO_IMPLEMENTATION
 #undef CORO_IMPLEMENTATION
 
@@ -266,19 +269,19 @@ CORODEF Coro coro_create(void *co) {
   //coro->stack = CORO_ALLOC(STACK_SIZE);
   coro->state = CORO_READY;
 #if defined(__aarch64__) || defined(__arm64__)
-  coro->stack = CORO_MMAP(NULL, STACK_SIZE + getpagesize(), PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE , -1, 0);
+  coro->stack = CORO_MMAP(NULL, STACK_SIZE + PAGE_SIZE, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE , -1, 0);
   coro->ctx.sp = (size_t)((char *)coro->stack + STACK_SIZE);
   coro->ctx.lr = (size_t)_turnaround;
   coro->ctx.fp = 0;
   coro->ctx.x19 = (size_t)co;
 #elif defined (__arm__)
-  coro->stack = CORO_MMAP(NULL, STACK_SIZE + getpagesize(), PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE | MAP_GROWSDOWN | MAP_STACK, -1, 0);
+  coro->stack = CORO_MMAP(NULL, STACK_SIZE + PAGE_SIZE, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE | MAP_GROWSDOWN | MAP_STACK, -1, 0);
   coro->ctx.sp = (size_t)((char *)coro->stack + STACK_SIZE);
   coro->ctx.lr = (size_t)_turnaround;
   coro->ctx.fp = 0;
   coro->ctx.r4 = (size_t)co;
 #else
-  coro->stack = CORO_MMAP(NULL, STACK_SIZE + getpagesize(), PROT_NONE, MAP_PRIVATE | MAP_STACK | MAP_ANONYMOUS | MAP_GROWSDOWN, -1, 0);
+  coro->stack = CORO_MMAP(NULL, STACK_SIZE + PAGE_SIZE, PROT_NONE, MAP_PRIVATE | MAP_STACK | MAP_ANONYMOUS, -1, 0);
   coro->ctx.rsp = (size_t)((char *)coro->stack + STACK_SIZE) & ~0xF;
   coro->ctx.rip = (size_t)_turnaround;
   coro->ctx.rbp = 0;
@@ -315,7 +318,7 @@ CORODEF void* coro_yield(void *pass) {
 }
 
 CORODEF void coro_destroy(Coro co) {
-  CORO_MUNMAP(co->stack, STACK_SIZE);
+  CORO_MUNMAP(co->stack, STACK_SIZE + PAGE_SIZE;
   CORO_FREE(co);
 }
 
@@ -325,5 +328,4 @@ CORODEF void __coro_finish() {
 }
 
 #endif // IMPLEMENTATION
-#endif // HEADER
 
