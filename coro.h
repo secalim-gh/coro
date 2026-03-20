@@ -29,6 +29,8 @@ CORODEF void *coro_yield(void *pass);
 CORODEF void coro_destroy(Coro co);
 CORODEF void *coro_resume(Coro co, void *pass);
 
+#define coro_y(type, ...) coro_yield(&(type){__VA_ARGS__})
+
 #endif // HEADER
 
 #ifdef CORO_IMPLEMENTATION
