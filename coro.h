@@ -18,8 +18,7 @@
 #define CORO_ALLOC malloc
 #define CORO_MMAP mmap
 #define CORO_MUNMAP munmap
-#define CORO_FREE                                                              \
-  free // If you provide ALLOC you should also provide FREE so they're tied here
+#define CORO_FREE free // If you provide ALLOC you should also provide FREE so they're tied here
 #endif
 
 typedef enum { CORO_READY, CORO_RUNNING, CORO_DEAD } CORO_STATE;
@@ -317,7 +316,7 @@ CORODEF void *coro_yield(void *pass) {
 }
 
 CORODEF void coro_destroy(Coro co) {
-  CORO_MUNMAP(co->stack, STACK_SIZE + PAGE_SIZE;
+  CORO_MUNMAP(co->stack, STACK_SIZE + PAGE_SIZE);
   CORO_FREE(co);
 }
 
