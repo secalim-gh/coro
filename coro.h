@@ -139,10 +139,10 @@ typedef struct __attribute__((aligned(8))) Context {
  *   Restores r4..r11, sp and lr from *new_ctx
  *   Branches to lr (which should point into the resumed context)
  *
- * Note:
- *  - We reserve r4 as the "function-pointer holder" (analogous to x19 in
- *    your AArch64 code). The coroutine entry function address should be
- *    placed into r4 in the stored context if needed.
+ * NOTE:
+ *  We reserve r4 as the "function-pointer holder". 
+ *  The coroutine entry function address should be
+ *  placed into r4 in the stored context if needed.
  */
 static void __attribute__((naked)) swap_context(struct Context *old_ctx,
                                                 struct Context *new_ctx) {
@@ -184,14 +184,11 @@ static void __attribute__((naked)) swap_context(struct Context *old_ctx,
 /*
  * _turnaround
  *
- * This mirrors your _pinpoint/_turnaround function: it does an indirect branch
+ * This mirrors _turnaround function: it does an indirect branch
  * to the saved "entry" register (r4). If the user-provided coroutine function
  * returns, call __coro_finish and then exit with status 0.
  *
  * Calling convention: no args; naked so we control registers exactly.
- *
- * Note: on AArch64 you used `blr x19`. Here we use `blx r4` so that `lr`
- * receives the return address just like blr did on AArch64.
  */
 static void __attribute__((naked)) _turnaround(void) {
   __asm__ volatile(

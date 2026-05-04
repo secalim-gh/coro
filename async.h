@@ -1,3 +1,7 @@
+//   TODO:
+// - Make it thread safe
+// - Implement more architectures
+
 #ifndef CORO_H
 #define CORO_H
 
